@@ -1,4 +1,4 @@
-# Easy HR React Application
+# Easy HR React Web Application
 
 
 ## Available Scripts
