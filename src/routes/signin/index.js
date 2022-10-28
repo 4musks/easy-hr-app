@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -109,6 +109,13 @@ export default function SignInContainer(props) {
           {state?.errors?.password && (
             <ErrorMessage message="Password is required" />
           )}
+        </div>
+
+        <div className="my-8">
+          Don't have an account?{" "}
+          <Link to="/signup" className="underline text-blue">
+            Sign Up
+          </Link>
         </div>
 
         <div className="my-4">

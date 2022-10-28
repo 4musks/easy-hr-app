@@ -1,8 +1,12 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 
 export default function ProtectedRoute(props) {
-  const { isLoggedIn, children } = props;
+  const { isLoggedIn, allowedRoles, role } = props;
 
-  return isLoggedIn ? children : <Navigate to="/signin" />;
+  return isLoggedIn && allowedRoles?.includes(role) ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/signin" replace />
+  );
 }
