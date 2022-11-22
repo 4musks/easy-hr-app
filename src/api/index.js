@@ -10,6 +10,7 @@ const API = axios.create({
 
 const getHeaders = () => ({
   "x-access-token": localStorage.getItem(APP_TOKEN),
+  "x-subdomain": "sjsu",
 });
 
 const Exception = (message) => {
@@ -53,6 +54,26 @@ export const signin = async (payload) => {
 export const getUserInfo = async () => {
   try {
     const response = await API.get("/users", { headers: getHeaders() });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
+// backend api call to add employee data to employee table
+export const inviteEmployee = async (payload) => {
+  try {
+    const response = await API.post("/employees", payload,{ headers: getHeaders() });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
+// backend api call to get employee data
+export const getSelfEmployeeDetails = async () => {
+  try {
+    const response = await API.get("/employees",{ headers: getHeaders() });
     return response?.data;
   } catch (error) {
     return processError(error);

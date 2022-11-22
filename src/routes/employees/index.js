@@ -10,6 +10,7 @@ import Spinner from "components/Spinner";
 import InviteEmployeeDialog from "components/InviteEmployeeDialog";
 import { useMergeState } from "utils/custom-hooks";
 import { formatDate } from "utils/date";
+import {getSelfEmployeeDetails, inviteEmployee} from "../../api";
 
 export default function EmployeesContainer() {
   const [state, setState] = useMergeState({
@@ -22,17 +23,27 @@ export default function EmployeesContainer() {
     setState({ shouldShowInviteEmployeeDialog: true });
   };
 
-  const handleCloseInviteEmployeeDialog = () => {
-    setState({ shouldShowInviteEmployeeDialog: false });
+  const handleCloseInviteEmployeeDialog =  () => {
+    setState({shouldShowInviteEmployeeDialog: false});
   };
 
-  const handleInviteEmployee = (payload) => {
+  const handleInviteEmployee = async (payload) => {
+    // adding employee to table
+    await inviteEmployee(payload)
+
+    // getting updated list of all employees
+    const employeeDetails = await getSelfEmployeeDetails();
+
+    // updating state with employees
+    setState({employees: employeeDetails.data.employees});
     console.log("payload : ", payload);
     handleCloseInviteEmployeeDialog();
   };
 
-  useEffect(() => {
-    // TODO: fetch employees
+  // get latest list of employees on first load
+  useEffect(async () => {
+    const employeeDetails = await getSelfEmployeeDetails();
+     setState({employees:employeeDetails.data.employees});
   }, []);
 
   return (

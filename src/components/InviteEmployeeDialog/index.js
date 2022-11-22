@@ -8,6 +8,7 @@ import { Dialog, DialogTitle } from "components/Dialog";
 import ErrorMessage from "components/ErrorMessage";
 import Button from "components/Button";
 import { useMergeState } from "utils/custom-hooks";
+import {inviteEmployee} from "../../api";
 
 export default function InviteEmployeeDialog(props) {
   const { open, onClose, onSave } = props;
@@ -83,13 +84,12 @@ export default function InviteEmployeeDialog(props) {
     return isValid;
   };
 
-  const handleSave = () => {
+  const handleSave =  () => {
     if (!isFormValid()) {
       return;
     }
 
-    const payload = { ...state };
-
+    const payload = {...state};
     delete payload.errors;
 
     onSave(payload);
