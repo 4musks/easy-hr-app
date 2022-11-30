@@ -10,7 +10,6 @@ export default function SignInCallbackContainer() {
   const { enqueueSnackbar } = useSnackbar();
 
   const handleSignIn = async () => {
-    debugger;
     if (user?.email) {
       const payload = {
         email: user?.email,
