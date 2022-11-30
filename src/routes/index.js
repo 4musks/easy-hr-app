@@ -1,13 +1,18 @@
 import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 import SignUpContainer from "./signup";
 import SignInContainer from "./signin";
-import DashboardOverviewContainer from "./dashboard/overview";
-import DashboardActivityContainer from "./dashboard/activity";
+import SignInCallbackContainer from "./signin/callback";
+import SignInIdentityContainer from "./signin/identity";
+import DashboardContainer from "./dashboard";
 import FeedbackContainer from "./feedback";
 import EmployeesContainer from "./employees";
 import WorklogContainer from "./work-log";
 import SettingsContainer from "./settings";
+import RewardsAndRecognitionContainer from "./recognition";
+import CompanyValuesContainer from "./company-values";
+import AcceptInviteContainer from "./accept-invite";
 import NavBar from "../components/NavBar";
 import Spinner from "../components/Spinner";
 import ProtectedRoute from "../components/ProtectedRoute";
@@ -16,7 +21,17 @@ import { getUserInfo } from "../api";
 import { APP_TOKEN, USER_ROLES } from "../utils/constants";
 import { useMergeState } from "../utils/custom-hooks";
 
+const shouldShowNavBar = () => {
+  if (window.location.pathname.includes("/accept-invite")) {
+    return false;
+  }
+
+  return true;
+};
+
 export default function RoutesContainer() {
+  const { user, isAuthenticated, loginWithRedirect, logout } = useAuth0();
+
   const [state, setState] = useMergeState({
     user: {},
     isLoggedIn: false,
@@ -50,7 +65,9 @@ export default function RoutesContainer() {
   return (
     <BrowserRouter>
       <div className="flex">
-        {state?.isLoggedIn && <NavBar user={state?.user} />}
+        {state?.isLoggedIn && shouldShowNavBar() && (
+          <NavBar user={state?.user} />
+        )}
 
         {isAppLoading ? (
           <div className="mt-10 w-full h-screen flex justify-center">
@@ -65,45 +82,85 @@ export default function RoutesContainer() {
                   element={<SignUpContainer getUserInfo={getUserInfoHandler} />}
                 />
 
+                <Route path="signin" element={<SignInContainer />} />
+
                 <Route
-                  path="signin"
-                  element={<SignInContainer getUserInfo={getUserInfoHandler} />}
+                  path="signin/callback"
+                  element={<SignInCallbackContainer />}
+                />
+
+                <Route
+                  path="signin/identity"
+                  element={
+                    <SignInIdentityContainer getUserInfo={getUserInfoHandler} />
+                  }
+                />
+
+                <Route
+                  path="accept-invite"
+                  element={
+                    <AcceptInviteContainer getUserInfo={getUserInfoHandler} />
+                  }
                 />
 
                 <Route
                   element={
                     <ProtectedRoute
                       isLoggedIn={state?.isLoggedIn}
-                      allowedRoles={[USER_ROLES.MANAGER, USER_ROLES.EMPLOYEE]}
+                      allowedRoles={[
+                        USER_ROLES.ADMIN,
+                        USER_ROLES.MANAGER,
+                        USER_ROLES.EMPLOYEE,
+                      ]}
                       role={state?.user?.role}
                     />
                   }
                 >
-                  <Route path="dashboard">
-                    <Route
-                      path="overview"
-                      element={<DashboardOverviewContainer />}
-                    />
-
-                    <Route
-                      path="activity"
-                      element={<DashboardActivityContainer />}
-                    />
-                  </Route>
+                  <Route
+                    path="dashboard"
+                    element={<DashboardContainer user={state?.user} />}
+                  />
 
                   <Route path="feedback" element={<FeedbackContainer />} />
 
-                  <Route path="employees" element={<EmployeesContainer />} />
-
                   <Route path="work-log" element={<WorklogContainer />} />
+
+                  <Route
+                    path="recognition"
+                    element={<RewardsAndRecognitionContainer />}
+                  />
 
                   <Route path="settings" element={<SettingsContainer />} />
                 </Route>
 
                 <Route
-                  path="/"
-                  element={<Navigate to="/dashboard/overview" />}
-                />
+                  element={
+                    <ProtectedRoute
+                      isLoggedIn={state?.isLoggedIn}
+                      allowedRoles={[USER_ROLES.ADMIN, USER_ROLES.MANAGER]}
+                      role={state?.user?.role}
+                    />
+                  }
+                >
+                  <Route path="employees" element={<EmployeesContainer />} />
+                </Route>
+
+                <Route
+                  element={
+                    <ProtectedRoute
+                      isLoggedIn={state?.isLoggedIn}
+                      allowedRoles={[USER_ROLES.ADMIN]}
+                      role={state?.user?.role}
+                    />
+                  }
+                >
+                  <Route
+                    path="company-values"
+                    element={<CompanyValuesContainer />}
+                  />
+                </Route>
+
+                <Route path="/" element={<Navigate to="/dashboard" />} />
               </Route>
 
               <Route path="*" element={<PageNotFound />} />

@@ -1,23 +1,24 @@
-import React from "react";
-import moment from "moment-timezone";
+import React, { useEffect } from "react";
 import TextField from "@mui/material/TextField";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
-import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import { Dialog, DialogTitle } from "components/Dialog";
 import ErrorMessage from "components/ErrorMessage";
 import Button from "components/Button";
 import { useMergeState } from "utils/custom-hooks";
 
-export default function AddWorklogDialog(props) {
-  const { open, onClose, onSave } = props;
+export default function AddCompanyValueDialog(props) {
+  const {
+    open,
+    shouldEdit = false,
+    selectedCompanyValue = {},
+    onClose,
+    onSave,
+  } = props;
 
   const [state, setState] = useMergeState({
-    serviceDate: moment(),
-    hours: 0,
-    notes: "",
+    title: "",
+    description: "",
     errors: {},
   });
 
@@ -35,13 +36,13 @@ export default function AddWorklogDialog(props) {
 
     let payload = {};
 
-    if (!state.serviceDate) {
-      payload = { serviceDate: true, ...payload };
+    if (!state.title) {
+      payload = { title: true };
       isValid = false;
     }
 
-    if (!state.hours) {
-      payload = { hours: true, ...payload };
+    if (!state.description) {
+      payload = { ...payload, description: true };
       isValid = false;
     }
 
@@ -57,10 +58,23 @@ export default function AddWorklogDialog(props) {
 
     const payload = { ...state };
 
+    if (shouldEdit) {
+      payload.id = selectedCompanyValue._id;
+    }
+
     delete payload.errors;
 
     onSave(payload);
   };
+
+  useEffect(() => {
+    if (shouldEdit) {
+      setState({
+        title: selectedCompanyValue?.title,
+        description: selectedCompanyValue?.description,
+      });
+    }
+  }, []);
 
   return (
     <Dialog
@@ -75,62 +89,42 @@ export default function AddWorklogDialog(props) {
       disableEscapeKeyDown
     >
       <DialogTitle onClose={onClose}>
-        <span className="text-xl font-semibold">Add Worklog</span>
+        <span className="text-xl font-semibold">Add Company Value</span>
       </DialogTitle>
 
       <DialogContent dividers>
-        <div className="mt-2">
-          <LocalizationProvider dateAdapter={AdapterMoment}>
-            <DesktopDatePicker
-              label="Service Date"
-              inputFormat="MM/DD/YYYY"
-              value={state?.serviceDate}
-              onChange={(newValue) => {
-                setState({ serviceDate: newValue });
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  fullWidth
-                  required
-                  error={state?.errors?.serviceDate}
-                />
-              )}
-            />
-          </LocalizationProvider>
-
-          {state?.errors?.serviceDate && (
-            <ErrorMessage message="Service Date is required" />
-          )}
-        </div>
-
         <div className="my-4">
           <TextField
             fullWidth
-            label="Hours"
+            label="Title"
             variant="outlined"
-            name="hours"
-            type="number"
-            value={state.hours}
+            name="title"
+            value={state.title}
             onChange={handleChange}
             required
-            error={state?.errors?.hours}
+            error={state?.errors?.title}
           />
 
-          {state?.errors?.hours && <ErrorMessage message="Hours is required" />}
+          {state?.errors?.title && <ErrorMessage message="Title is required" />}
         </div>
 
         <div className="my-4">
           <TextField
             fullWidth
-            label="Notes"
+            label="Description"
             variant="outlined"
-            name="notes"
-            value={state.notes}
+            name="description"
+            value={state.description}
             onChange={handleChange}
+            required
+            error={state?.errors?.description}
             multiline
             minRows={5}
           />
+
+          {state?.errors?.description && (
+            <ErrorMessage message="Description is required" />
+          )}
         </div>
       </DialogContent>
 

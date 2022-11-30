@@ -1,14 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 import TextField from "@mui/material/TextField";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { MenuItem, FormControl, Select, InputLabel } from "@mui/material";
 import { Dialog, DialogTitle } from "components/Dialog";
 import ErrorMessage from "components/ErrorMessage";
 import Button from "components/Button";
 import { useMergeState } from "utils/custom-hooks";
-import {inviteEmployee} from "../../api";
+import { USER_ROLES } from "utils/constants";
+import { getUsers } from "api";
 
 export default function InviteEmployeeDialog(props) {
   const { open, onClose, onSave } = props;
@@ -21,7 +23,9 @@ export default function InviteEmployeeDialog(props) {
     department: "",
     designation: "",
     joiningDate: "",
-    annualIncome: "",
+    hourlyRate: "",
+    manager: "",
+    users: [],
     errors: {},
   });
 
@@ -74,8 +78,18 @@ export default function InviteEmployeeDialog(props) {
       isValid = false;
     }
 
-    if (!state.annualIncome) {
-      payload = { annualIncome: true, ...payload };
+    if (!state.hourlyRate) {
+      payload = { hourlyRate: true, ...payload };
+      isValid = false;
+    }
+
+    if (!state.role) {
+      payload = { role: true, ...payload };
+      isValid = false;
+    }
+
+    if (state.role === USER_ROLES.EMPLOYEE && !state.manager) {
+      payload = { manager: true, ...payload };
       isValid = false;
     }
 
@@ -84,16 +98,31 @@ export default function InviteEmployeeDialog(props) {
     return isValid;
   };
 
-  const handleSave =  () => {
+  const handleSave = () => {
     if (!isFormValid()) {
       return;
     }
 
-    const payload = {...state};
+    const payload = { ...state };
+
     delete payload.errors;
 
     onSave(payload);
   };
+
+  useEffect(() => {
+    const init = async () => {
+      const response = await getUsers({ all: true });
+
+      if (response?.success) {
+        setState({
+          users: response?.data,
+        });
+      }
+    };
+
+    init();
+  }, []);
 
   return (
     <Dialog
@@ -251,19 +280,77 @@ export default function InviteEmployeeDialog(props) {
           <div className="w-1/2 ml-1">
             <TextField
               fullWidth
-              label="Annual Income"
+              label="Hourly Rate"
               variant="outlined"
-              name="annualIncome"
-              value={state.annualIncome}
+              name="hourlyRate"
+              value={state.hourlyRate}
               onChange={handleChange}
               required
-              error={state?.errors?.annualIncome}
+              error={state?.errors?.hourlyRate}
             />
 
-            {state?.errors?.annualIncome && (
-              <ErrorMessage message="Annual Income is required" />
+            {state?.errors?.hourlyRate && (
+              <ErrorMessage message="Hourly Rate is required" />
             )}
           </div>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <div className="w-1/2">
+            <FormControl fullWidth>
+              <InputLabel>Role</InputLabel>
+              <Select
+                label="Role"
+                name="role"
+                value={state?.role}
+                onChange={handleChange}
+                autoComplete="off"
+                inputProps={{
+                  autoComplete: "new-password",
+                }}
+                displayEmpty
+                fullWidth
+              >
+                <MenuItem value="" disabled>
+                  Select an option...
+                </MenuItem>
+                {Object.values(USER_ROLES).map((item, index) => (
+                  <MenuItem key={`${item}#${index}`} value={item}>
+                    {item}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </div>
+
+          {state?.role === USER_ROLES.EMPLOYEE && (
+            <div className="w-1/2 ml-1">
+              <FormControl fullWidth>
+                <InputLabel>Manager</InputLabel>
+                <Select
+                  label="Manager"
+                  name="manager"
+                  value={state?.manager}
+                  onChange={handleChange}
+                  autoComplete="off"
+                  inputProps={{
+                    autoComplete: "new-password",
+                  }}
+                  displayEmpty
+                  fullWidth
+                >
+                  <MenuItem value="" disabled>
+                    Select an option...
+                  </MenuItem>
+                  {state.users.map((item) => (
+                    <MenuItem key={item._id} value={item._id}>
+                      {item.firstName} {item.lastName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
+          )}
         </div>
       </DialogContent>
 

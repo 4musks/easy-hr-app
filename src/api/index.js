@@ -1,5 +1,6 @@
 import axios from "axios";
 import { APP_TOKEN } from "../utils/constants";
+import { getSubdomain } from "../utils/common";
 
 const API = axios.create({
   baseURL: process.env.REACT_APP_API_BASE_URL,
@@ -10,7 +11,7 @@ const API = axios.create({
 
 const getHeaders = () => ({
   "x-access-token": localStorage.getItem(APP_TOKEN),
-  "x-subdomain": "sjsu",
+  "x-subdomain": getSubdomain(),
 });
 
 const Exception = (message) => {
@@ -53,27 +54,183 @@ export const signin = async (payload) => {
 
 export const getUserInfo = async () => {
   try {
-    const response = await API.get("/users", { headers: getHeaders() });
+    const response = await API.get("/users/info", { headers: getHeaders() });
     return response?.data;
   } catch (error) {
     return processError(error);
   }
 };
 
-// backend api call to add employee data to employee table
-export const inviteEmployee = async (payload) => {
+export const getUsers = async (params) => {
   try {
-    const response = await API.post("/employees", payload,{ headers: getHeaders() });
+    const response = await API.get("/users", { params, headers: getHeaders() });
     return response?.data;
   } catch (error) {
     return processError(error);
   }
 };
 
-// backend api call to get employee data
-export const getSelfEmployeeDetails = async () => {
+export const updateProfile = async (payload) => {
   try {
-    const response = await API.get("/employees",{ headers: getHeaders() });
+    const response = await API.put("/users/profile", payload, {
+      headers: getHeaders(),
+    });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
+export const triggerInvite = async (payload) => {
+  try {
+    const response = await API.post("/users/invite", payload, {
+      headers: getHeaders(),
+    });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
+export const acceptInvite = async (payload) => {
+  try {
+    const response = await API.post("/users/accept-invite", payload, {
+      headers: getHeaders(),
+    });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
+export const getFeedback = async () => {
+  try {
+    const response = await API.get("/feedback", {
+      headers: getHeaders(),
+    });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
+export const createFeedback = async (payload) => {
+  try {
+    const response = await API.post("/feedback", payload, {
+      headers: getHeaders(),
+    });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
+export const getStats = async () => {
+  try {
+    const response = await API.get("/stats", {
+      headers: getHeaders(),
+    });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
+export const getWorklog = async () => {
+  try {
+    const response = await API.get("/worklog", {
+      headers: getHeaders(),
+    });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
+export const createWorklog = async (payload) => {
+  try {
+    const response = await API.post("/worklog", payload, {
+      headers: getHeaders(),
+    });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
+export const getCompanyValues = async () => {
+  try {
+    const response = await API.get("/company-values", {
+      headers: getHeaders(),
+    });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
+export const addCompanyValue = async (payload) => {
+  try {
+    const response = await API.post("/company-values", payload, {
+      headers: getHeaders(),
+    });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
+export const updateCompanyValue = async (payload) => {
+  try {
+    const response = await API.put("/company-values", payload, {
+      headers: getHeaders(),
+    });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
+export const deleteCompanyValue = async (params) => {
+  try {
+    const response = await API.delete("/company-values", {
+      params,
+      headers: getHeaders(),
+    });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
+export const getRecognition = async () => {
+  try {
+    const response = await API.get("/recognition", {
+      headers: getHeaders(),
+    });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
+export const addRecognition = async (payload) => {
+  try {
+    const response = await API.post("/recognition", payload, {
+      headers: getHeaders(),
+    });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
+export const deleteRecognition = async (params) => {
+  try {
+    const response = await API.delete("/recognition", {
+      params,
+      headers: getHeaders(),
+    });
     return response?.data;
   } catch (error) {
     return processError(error);

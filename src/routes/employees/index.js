@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useSnackbar } from "notistack";
 import TableContainer from "@mui/material/TableContainer";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -10,9 +11,11 @@ import Spinner from "components/Spinner";
 import InviteEmployeeDialog from "components/InviteEmployeeDialog";
 import { useMergeState } from "utils/custom-hooks";
 import { formatDate } from "utils/date";
-import {getSelfEmployeeDetails, inviteEmployee} from "../../api";
+import { getUsers, triggerInvite } from "../../api";
 
 export default function EmployeesContainer() {
+  const { enqueueSnackbar } = useSnackbar();
+
   const [state, setState] = useMergeState({
     employees: [],
     shouldShowInviteEmployeeDialog: false,
@@ -23,27 +26,38 @@ export default function EmployeesContainer() {
     setState({ shouldShowInviteEmployeeDialog: true });
   };
 
-  const handleCloseInviteEmployeeDialog =  () => {
-    setState({shouldShowInviteEmployeeDialog: false});
+  const handleCloseInviteEmployeeDialog = () => {
+    setState({ shouldShowInviteEmployeeDialog: false });
+  };
+
+  const init = async () => {
+    setState({ isLoading: true });
+
+    const response = await getUsers();
+
+    if (response?.success) {
+      setState({ employees: response?.data });
+    } else {
+      enqueueSnackbar(response?.message, { variant: "error" });
+    }
+
+    setState({ isLoading: false });
   };
 
   const handleInviteEmployee = async (payload) => {
-    // adding employee to table
-    await inviteEmployee(payload)
+    const response = await triggerInvite(payload);
 
-    // getting updated list of all employees
-    const employeeDetails = await getSelfEmployeeDetails();
-
-    // updating state with employees
-    setState({employees: employeeDetails.data.employees});
-    console.log("payload : ", payload);
-    handleCloseInviteEmployeeDialog();
+    if (response?.success) {
+      enqueueSnackbar(response?.message, { variant: "success" });
+      await init();
+      handleCloseInviteEmployeeDialog();
+    } else {
+      enqueueSnackbar(response?.message, { variant: "error" });
+    }
   };
 
-  // get latest list of employees on first load
-  useEffect(async () => {
-    const employeeDetails = await getSelfEmployeeDetails();
-     setState({employees:employeeDetails.data.employees});
+  useEffect(() => {
+    init();
   }, []);
 
   return (
@@ -96,44 +110,52 @@ export default function EmployeesContainer() {
                   <TableCell align="left">
                     <span className="text-grey">Annual Income</span>
                   </TableCell>
+                  <TableCell align="left">
+                    <span className="text-grey">Status</span>
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody style={{ overflow: "visible" }}>
                 {state?.employees?.map((employee) => (
                   <TableRow key={employee._id}>
-                    <TableCell component="th" scope="row" align="center">
+                    <TableCell component="th" scope="row" align="left">
                       <span className="text-grey text-xs">
                         {employee?.firstName} {employee?.lastName}
                       </span>
                     </TableCell>
-                    <TableCell component="th" scope="row" align="center">
+                    <TableCell component="th" scope="row" align="left">
                       <span className="text-grey text-xs">
                         {formatDate(employee?.dob, "MM/DD/YYYY")}
                       </span>
                     </TableCell>
-                    <TableCell component="th" scope="row" align="center">
+                    <TableCell component="th" scope="row" align="left">
                       <span className="text-grey text-xs">
                         {employee?.email}
                       </span>
                     </TableCell>
-                    <TableCell component="th" scope="row" align="center">
+                    <TableCell component="th" scope="row" align="left">
                       <span className="text-grey text-xs">
                         {employee?.department}
                       </span>
                     </TableCell>
-                    <TableCell component="th" scope="row" align="center">
+                    <TableCell component="th" scope="row" align="left">
                       <span className="text-grey text-xs">
                         {employee?.designation}
                       </span>
                     </TableCell>
-                    <TableCell component="th" scope="row" align="center">
+                    <TableCell component="th" scope="row" align="left">
                       <span className="text-grey text-xs">
-                        {employee?.joiningDate}
+                        {formatDate(employee?.joiningDate, "ll")}
                       </span>
                     </TableCell>
-                    <TableCell component="th" scope="row" align="center">
+                    <TableCell component="th" scope="row" align="left">
                       <span className="text-grey text-xs">
-                        ${employee?.annualIncome}
+                        ${employee?.hourlyRate}
+                      </span>
+                    </TableCell>
+                    <TableCell component="th" scope="row" align="left">
+                      <span className="text-grey text-xs">
+                        {employee?.status}
                       </span>
                     </TableCell>
                     {/* <TableCell component="th" scope="row" align="left">
