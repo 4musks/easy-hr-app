@@ -104,11 +104,6 @@ export default function NavBar(props) {
     }
   };
 
-  const handleInnerNavChange = (innerNav) => {
-    setState({ selectedInnerNav: innerNav });
-    navigate(`${state.selectedNav.route}${innerNav.route}`);
-  };
-
   const handleOpenProfileMenu = (event) => {
     setState({ profileMenuAnchorEl: event.currentTarget });
   };
@@ -173,8 +168,8 @@ export default function NavBar(props) {
   }, []);
 
   return (
-    <div className="w-1/4 flex">
-      <div className="w-20 h-screen border-r border-gray-200 flex flex-col justify-between">
+    <div className="w-1/6 flex">
+      <div className="w-16 h-screen border-r border-gray-200 flex flex-col justify-between">
         <div className="my-6 text-center text-sm font-semibold">Easy HR</div>
 
         <div className="flex flex-col items-center">
@@ -221,34 +216,6 @@ export default function NavBar(props) {
               Logout
             </MenuItem>
           </Menu>
-        </div>
-      </div>
-
-      <div className="w-full h-screen border-r border-gray-200 flex flex-col justify-between items-center">
-        <div className="pt-4 w-5/6">
-          <div className="flex text-2xl font-semibold">
-            {state.selectedNav?.title}
-          </div>
-
-          <div className="mt-8 flex flex-col">
-            {state.selectedNav?.innerNavs.map((innerNav) => (
-              <div
-                key={innerNav.id}
-                className={`w-full h-full flex mb-4 text-gray-500 ${
-                  state.selectedInnerNav?.id === innerNav.id
-                    ? "text-gray-900 font-semibold"
-                    : ""
-                }`}
-              >
-                <div
-                  className="cursor-pointer"
-                  onClick={() => handleInnerNavChange(innerNav)}
-                >
-                  {innerNav.title}
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </div>

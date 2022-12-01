@@ -3,13 +3,20 @@ import { useSnackbar } from "notistack";
 import { useAuth0 } from "@auth0/auth0-react";
 import Spinner from "components/Spinner";
 import { signin } from "../../api";
+import { useMergeState } from "utils/custom-hooks";
 
 export default function SignInCallbackContainer() {
-  const { isLoading, user, logout } = useAuth0();
+  const { user, logout } = useAuth0();
 
   const { enqueueSnackbar } = useSnackbar();
 
+  const [state, setState] = useMergeState({
+    isLoading: false,
+  });
+
   const handleSignIn = async () => {
+    setState({ isLoading: true });
+
     if (user?.email) {
       const payload = {
         email: user?.email,
@@ -26,6 +33,8 @@ export default function SignInCallbackContainer() {
         });
       }
     }
+
+    setState({ isLoading: false });
   };
 
   useEffect(() => {
@@ -34,9 +43,9 @@ export default function SignInCallbackContainer() {
 
   return (
     <div>
-      {isLoading && (
+      {state?.isLoading && (
         <div className="mt-10 w-full h-screen flex justify-center">
-          <Spinner loading={isLoading} />
+          <Spinner loading={state?.isLoading} />
         </div>
       )}
     </div>

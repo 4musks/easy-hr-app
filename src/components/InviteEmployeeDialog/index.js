@@ -13,7 +13,7 @@ import { USER_ROLES } from "utils/constants";
 import { getUsers } from "api";
 
 export default function InviteEmployeeDialog(props) {
-  const { open, onClose, onSave } = props;
+  const { open, user, onClose, onSave } = props;
 
   const [state, setState] = useMergeState({
     firstName: "",
@@ -24,6 +24,7 @@ export default function InviteEmployeeDialog(props) {
     designation: "",
     joiningDate: "",
     hourlyRate: "",
+    role: "",
     manager: "",
     users: [],
     errors: {},
@@ -120,6 +121,13 @@ export default function InviteEmployeeDialog(props) {
         });
       }
     };
+
+    if (user?.role === USER_ROLES.MANAGER) {
+      setState({
+        role: USER_ROLES.EMPLOYEE,
+        manager: user?._id,
+      });
+    }
 
     init();
   }, []);
@@ -310,10 +318,10 @@ export default function InviteEmployeeDialog(props) {
                 }}
                 displayEmpty
                 fullWidth
+                disabled={user?.role === USER_ROLES.MANAGER}
+                required
+                error={state?.errors?.role}
               >
-                <MenuItem value="" disabled>
-                  Select an option...
-                </MenuItem>
                 {Object.values(USER_ROLES).map((item, index) => (
                   <MenuItem key={`${item}#${index}`} value={item}>
                     {item}
@@ -321,6 +329,8 @@ export default function InviteEmployeeDialog(props) {
                 ))}
               </Select>
             </FormControl>
+
+            {state?.errors?.role && <ErrorMessage message="Role is required" />}
           </div>
 
           {state?.role === USER_ROLES.EMPLOYEE && (
@@ -338,10 +348,10 @@ export default function InviteEmployeeDialog(props) {
                   }}
                   displayEmpty
                   fullWidth
+                  disabled={user?.role === USER_ROLES.MANAGER}
+                  required
+                  error={state?.errors?.manager}
                 >
-                  <MenuItem value="" disabled>
-                    Select an option...
-                  </MenuItem>
                   {state.users.map((item) => (
                     <MenuItem key={item._id} value={item._id}>
                       {item.firstName} {item.lastName}
@@ -349,6 +359,10 @@ export default function InviteEmployeeDialog(props) {
                   ))}
                 </Select>
               </FormControl>
+
+              {state?.errors?.manager && (
+                <ErrorMessage message="Manager is required" />
+              )}
             </div>
           )}
         </div>

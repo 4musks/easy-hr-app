@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import moment from "moment-timezone";
 import TextField from "@mui/material/TextField";
 import DialogContent from "@mui/material/DialogContent";
@@ -12,7 +12,7 @@ import Button from "components/Button";
 import { useMergeState } from "utils/custom-hooks";
 
 export default function AddWorklogDialog(props) {
-  const { open, onClose, onSave } = props;
+  const { open, shouldEdit, selectedWorklog, onClose, onSave } = props;
 
   const [state, setState] = useMergeState({
     serviceDate: moment(),
@@ -45,6 +45,11 @@ export default function AddWorklogDialog(props) {
       isValid = false;
     }
 
+    if (!state.notes) {
+      payload = { notes: true, ...payload };
+      isValid = false;
+    }
+
     setState({ errors: { ...payload } });
 
     return isValid;
@@ -57,10 +62,24 @@ export default function AddWorklogDialog(props) {
 
     const payload = { ...state };
 
+    if (shouldEdit) {
+      payload.id = selectedWorklog?._id;
+    }
+
     delete payload.errors;
 
     onSave(payload);
   };
+
+  useEffect(() => {
+    if (shouldEdit) {
+      setState({
+        serviceDate: selectedWorklog?.serviceDate,
+        hours: selectedWorklog?.hours,
+        notes: selectedWorklog?.notes,
+      });
+    }
+  }, []);
 
   return (
     <Dialog
@@ -130,7 +149,11 @@ export default function AddWorklogDialog(props) {
             onChange={handleChange}
             multiline
             minRows={5}
+            required
+            error={state?.errors?.notes}
           />
+
+          {state?.errors?.notes && <ErrorMessage message="Notes is required" />}
         </div>
       </DialogContent>
 

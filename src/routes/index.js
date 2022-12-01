@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useAuth0 } from "@auth0/auth0-react";
 import SignUpContainer from "./signup";
 import SignInContainer from "./signin";
 import SignInCallbackContainer from "./signin/callback";
@@ -30,8 +29,6 @@ const shouldShowNavBar = () => {
 };
 
 export default function RoutesContainer() {
-  const { user, isAuthenticated, loginWithRedirect, logout } = useAuth0();
-
   const [state, setState] = useMergeState({
     user: {},
     isLoggedIn: false,
@@ -121,13 +118,21 @@ export default function RoutesContainer() {
                     element={<DashboardContainer user={state?.user} />}
                   />
 
-                  <Route path="feedback" element={<FeedbackContainer />} />
+                  <Route
+                    path="feedback"
+                    element={<FeedbackContainer user={state?.user} />}
+                  />
 
-                  <Route path="work-log" element={<WorklogContainer />} />
+                  <Route
+                    path="work-log"
+                    element={<WorklogContainer user={state?.user} />}
+                  />
 
                   <Route
                     path="recognition"
-                    element={<RewardsAndRecognitionContainer />}
+                    element={
+                      <RewardsAndRecognitionContainer user={state?.user} />
+                    }
                   />
 
                   <Route path="settings" element={<SettingsContainer />} />
@@ -142,7 +147,10 @@ export default function RoutesContainer() {
                     />
                   }
                 >
-                  <Route path="employees" element={<EmployeesContainer />} />
+                  <Route
+                    path="employees"
+                    element={<EmployeesContainer user={state?.user} />}
+                  />
                 </Route>
 
                 <Route

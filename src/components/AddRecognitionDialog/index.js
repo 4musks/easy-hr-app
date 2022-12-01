@@ -10,7 +10,7 @@ import { useMergeState } from "utils/custom-hooks";
 import { getUsers, getCompanyValues } from "api";
 
 export default function AddRecognitionDialog(props) {
-  const { open, onClose, onSave } = props;
+  const { open, shouldEdit, selectedRecognition, onClose, onSave } = props;
 
   const [state, setState] = useMergeState({
     toUser: "",
@@ -62,6 +62,10 @@ export default function AddRecognitionDialog(props) {
 
     const payload = { ...state };
 
+    if (shouldEdit) {
+      payload.id = selectedRecognition?._id;
+    }
+
     delete payload.errors;
     delete payload.users;
     delete payload.companyValues;
@@ -87,6 +91,14 @@ export default function AddRecognitionDialog(props) {
         });
       }
     };
+
+    if (shouldEdit) {
+      setState({
+        toUser: selectedRecognition?.toUser?._id,
+        companyValue: selectedRecognition?.companyValue?._id,
+        description: selectedRecognition?.description,
+      });
+    }
 
     init();
   }, []);
@@ -122,6 +134,7 @@ export default function AddRecognitionDialog(props) {
               }}
               displayEmpty
               fullWidth
+              disabled={shouldEdit}
             >
               {state.users.map((item) => (
                 <MenuItem key={item._id} value={item._id}>

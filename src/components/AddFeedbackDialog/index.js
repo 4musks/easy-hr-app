@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import TextField from "@mui/material/TextField";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
@@ -9,7 +9,7 @@ import Button from "components/Button";
 import { useMergeState } from "utils/custom-hooks";
 
 export default function AddFeedbackDialog(props) {
-  const { open, onClose, onSave } = props;
+  const { open, shouldEdit, selectedFeedback, onClose, onSave } = props;
 
   const [state, setState] = useMergeState({
     description: "",
@@ -52,10 +52,23 @@ export default function AddFeedbackDialog(props) {
 
     const payload = { ...state };
 
+    if (shouldEdit) {
+      payload.id = selectedFeedback?._id;
+    }
+
     delete payload.errors;
 
     onSave(payload);
   };
+
+  useEffect(() => {
+    if (shouldEdit) {
+      setState({
+        description: selectedFeedback?.description,
+        isAnonymous: selectedFeedback?.isAnonymous,
+      });
+    }
+  }, []);
 
   return (
     <Dialog

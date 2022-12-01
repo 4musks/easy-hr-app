@@ -125,6 +125,29 @@ export const createFeedback = async (payload) => {
   }
 };
 
+export const updateFeedback = async (payload) => {
+  try {
+    const response = await API.put("/feedback", payload, {
+      headers: getHeaders(),
+    });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
+export const deleteFeedback = async (params) => {
+  try {
+    const response = await API.delete("/feedback", {
+      params,
+      headers: getHeaders(),
+    });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
 export const getStats = async () => {
   try {
     const response = await API.get("/stats", {
@@ -150,6 +173,29 @@ export const getWorklog = async () => {
 export const createWorklog = async (payload) => {
   try {
     const response = await API.post("/worklog", payload, {
+      headers: getHeaders(),
+    });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
+export const updateWorklog = async (payload) => {
+  try {
+    const response = await API.put("/worklog", payload, {
+      headers: getHeaders(),
+    });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
+export const deleteWorklog = async (params) => {
+  try {
+    const response = await API.delete("/worklog", {
+      params,
       headers: getHeaders(),
     });
     return response?.data;
@@ -217,6 +263,17 @@ export const getRecognition = async () => {
 export const addRecognition = async (payload) => {
   try {
     const response = await API.post("/recognition", payload, {
+      headers: getHeaders(),
+    });
+    return response?.data;
+  } catch (error) {
+    return processError(error);
+  }
+};
+
+export const updateRecognition = async (payload) => {
+  try {
+    const response = await API.put("/recognition", payload, {
       headers: getHeaders(),
     });
     return response?.data;

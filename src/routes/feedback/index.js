@@ -1,26 +1,49 @@
 import React, { useEffect } from "react";
 import { useSnackbar } from "notistack";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import Button from "components/Button";
 import Spinner from "components/Spinner";
 import AddFeedbackDialog from "components/AddFeedbackDialog";
 import { useMergeState } from "utils/custom-hooks";
-import { getFeedback, createFeedback } from "../../api";
+import {
+  getFeedback,
+  createFeedback,
+  updateFeedback,
+  deleteFeedback,
+} from "../../api";
 
-export default function FeedbackContainer() {
+export default function FeedbackContainer(props) {
+  const { user } = props;
+
   const { enqueueSnackbar } = useSnackbar();
 
   const [state, setState] = useMergeState({
     feedback: [],
     shouldShowAddFeedbackDialog: false,
+    shouldEdit: false,
+    selectedFeedback: {},
     isLoading: false,
   });
 
-  const handleOpenAddFeedbackDialog = () => {
-    setState({ shouldShowAddFeedbackDialog: true });
+  const handleOpenAddFeedbackDialog = (
+    shouldEdit = false,
+    selectedFeedback = {}
+  ) => {
+    setState({
+      shouldShowAddFeedbackDialog: true,
+      shouldEdit,
+      selectedFeedback,
+    });
   };
 
   const handleCloseAddFeedbackDialog = () => {
-    setState({ shouldShowAddFeedbackDialog: false });
+    setState({
+      shouldShowAddFeedbackDialog: false,
+      shouldEdit: false,
+      selectedFeedback: {},
+    });
   };
 
   const init = async () => {
@@ -40,12 +63,29 @@ export default function FeedbackContainer() {
   };
 
   const handleAddFeedback = async (payload) => {
-    const response = await createFeedback(payload);
+    let response = null;
+
+    if (state?.shouldEdit) {
+      response = await updateFeedback(payload);
+    } else {
+      response = await createFeedback(payload);
+    }
 
     if (response?.success) {
       enqueueSnackbar(response?.message, { variant: "success" });
       await init();
       handleCloseAddFeedbackDialog();
+    } else {
+      enqueueSnackbar(response?.message, { variant: "error" });
+    }
+  };
+
+  const handleDelete = async (id) => {
+    const response = await deleteFeedback({ id });
+
+    if (response?.success) {
+      enqueueSnackbar(response?.message, { variant: "success" });
+      await init();
     } else {
       enqueueSnackbar(response?.message, { variant: "error" });
     }
@@ -70,7 +110,7 @@ export default function FeedbackContainer() {
                 <Button
                   label="Add Feedback"
                   color="secondary"
-                  onClick={handleOpenAddFeedbackDialog}
+                  onClick={() => handleOpenAddFeedbackDialog(false)}
                   style={{
                     borderRadius: 10,
                     fontSize: 14,
@@ -93,7 +133,7 @@ export default function FeedbackContainer() {
               {state?.feedback?.map((elem) => (
                 <div
                   key={elem?._id}
-                  className="p-4 flex items-center mt-4 card"
+                  className="p-4 flex justify-between items-center mt-4 card"
                 >
                   <div>
                     <div className="text-sm">
@@ -105,6 +145,23 @@ export default function FeedbackContainer() {
 
                     <div className="text-xs mt-2">{elem?.description}</div>
                   </div>
+
+                  {user?._id === elem?.user?._id && (
+                    <div>
+                      <IconButton
+                        onClick={() => handleOpenAddFeedbackDialog(true, elem)}
+                      >
+                        <EditIcon />
+                      </IconButton>
+
+                      <IconButton
+                        onClick={() => handleDelete(elem?._id)}
+                        sx={{ marginLeft: 2 }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -115,6 +172,8 @@ export default function FeedbackContainer() {
       {state?.shouldShowAddFeedbackDialog && (
         <AddFeedbackDialog
           open={state?.shouldShowAddFeedbackDialog}
+          shouldEdit={state?.shouldEdit}
+          selectedFeedback={state?.selectedFeedback}
           onClose={handleCloseAddFeedbackDialog}
           onSave={handleAddFeedback}
         />

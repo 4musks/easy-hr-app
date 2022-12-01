@@ -1,27 +1,50 @@
 import React, { useEffect } from "react";
 import { useSnackbar } from "notistack";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { TwitterShareButton } from "react-twitter-embed";
 import Button from "components/Button";
 import Spinner from "components/Spinner";
 import AddRecognitionDialog from "components/AddRecognitionDialog";
 import { useMergeState } from "utils/custom-hooks";
-import { getRecognition, addRecognition, deleteRecognition } from "../../api";
+import {
+  getRecognition,
+  addRecognition,
+  updateRecognition,
+  deleteRecognition,
+} from "../../api";
 
-export default function RewardsAndRecognitionContainer() {
+export default function RewardsAndRecognitionContainer(props) {
+  const { user } = props;
+
   const { enqueueSnackbar } = useSnackbar();
 
   const [state, setState] = useMergeState({
     recognition: [],
     shouldShowAddRecognitionDialog: false,
+    shouldEdit: false,
+    selectedRecognition: {},
     isLoading: false,
   });
 
-  const handleOpenAddRecognitionDialog = () => {
-    setState({ shouldShowAddRecognitionDialog: true });
+  const handleOpenAddRecognitionDialog = (
+    shouldEdit = false,
+    selectedRecognition = {}
+  ) => {
+    setState({
+      shouldShowAddRecognitionDialog: true,
+      shouldEdit,
+      selectedRecognition,
+    });
   };
 
   const handleCloseAddRecognitionDialog = () => {
-    setState({ shouldShowAddRecognitionDialog: false });
+    setState({
+      shouldShowAddRecognitionDialog: false,
+      shouldEdit: false,
+      selectedRecognition: {},
+    });
   };
 
   const init = async () => {
@@ -41,12 +64,29 @@ export default function RewardsAndRecognitionContainer() {
   };
 
   const handleAddRecognition = async (payload) => {
-    const response = await addRecognition(payload);
+    let response = null;
+
+    if (state?.shouldEdit) {
+      response = await updateRecognition(payload);
+    } else {
+      response = await addRecognition(payload);
+    }
 
     if (response?.success) {
       enqueueSnackbar(response?.message, { variant: "success" });
       await init();
       handleCloseAddRecognitionDialog();
+    } else {
+      enqueueSnackbar(response?.message, { variant: "error" });
+    }
+  };
+
+  const handleDelete = async (id) => {
+    const response = await deleteRecognition({ id });
+
+    if (response?.success) {
+      enqueueSnackbar(response?.message, { variant: "success" });
+      await init();
     } else {
       enqueueSnackbar(response?.message, { variant: "error" });
     }
@@ -73,7 +113,7 @@ export default function RewardsAndRecognitionContainer() {
                 <Button
                   label="Give Recognition"
                   color="secondary"
-                  onClick={handleOpenAddRecognitionDialog}
+                  onClick={() => handleOpenAddRecognitionDialog(false)}
                   style={{
                     borderRadius: 10,
                     fontSize: 14,
@@ -116,13 +156,33 @@ export default function RewardsAndRecognitionContainer() {
                     </span>
                   </div>
 
-                  <TwitterShareButton
-                    onLoad={function noRefCheck() {}}
-                    options={{
-                      text: elem?.description,
-                    }}
-                    url="https://twitter.com/SJSU"
-                  />
+                  <div>
+                    {user?._id === elem?.toUser?._id && (
+                      <TwitterShareButton
+                        onLoad={function noRefCheck() {}}
+                        options={{
+                          text: elem?.description,
+                        }}
+                        url="https://twitter.com/SJSU"
+                      />
+                    )}
+
+                    {user?._id === elem?.fromUser?._id && (
+                      <div className="mt-4">
+                        <IconButton
+                          onClick={() =>
+                            handleOpenAddRecognitionDialog(true, elem)
+                          }
+                        >
+                          <EditIcon />
+                        </IconButton>
+
+                        <IconButton onClick={() => handleDelete(elem?._id)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -133,6 +193,8 @@ export default function RewardsAndRecognitionContainer() {
       {state?.shouldShowAddRecognitionDialog && (
         <AddRecognitionDialog
           open={state?.shouldShowAddRecognitionDialog}
+          shouldEdit={state?.shouldEdit}
+          selectedRecognition={state?.selectedRecognition}
           onClose={handleCloseAddRecognitionDialog}
           onSave={handleAddRecognition}
         />

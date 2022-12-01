@@ -13,7 +13,9 @@ import { useMergeState } from "utils/custom-hooks";
 import { formatDate } from "utils/date";
 import { getUsers, triggerInvite } from "../../api";
 
-export default function EmployeesContainer() {
+export default function EmployeesContainer(props) {
+  const { user } = props;
+
   const { enqueueSnackbar } = useSnackbar();
 
   const [state, setState] = useMergeState({
@@ -108,7 +110,10 @@ export default function EmployeesContainer() {
                     <span className="text-grey">Joining Date</span>
                   </TableCell>
                   <TableCell align="left">
-                    <span className="text-grey">Annual Income</span>
+                    <span className="text-grey">Hourly Rate</span>
+                  </TableCell>
+                  <TableCell align="left">
+                    <span className="text-grey">Role</span>
                   </TableCell>
                   <TableCell align="left">
                     <span className="text-grey">Status</span>
@@ -155,14 +160,14 @@ export default function EmployeesContainer() {
                     </TableCell>
                     <TableCell component="th" scope="row" align="left">
                       <span className="text-grey text-xs">
+                        {employee?.role}
+                      </span>
+                    </TableCell>
+                    <TableCell component="th" scope="row" align="left">
+                      <span className="text-grey text-xs">
                         {employee?.status}
                       </span>
                     </TableCell>
-                    {/* <TableCell component="th" scope="row" align="left">
-            <span className="text-grey text-xs underline cursor-pointer">
-              contact/edit
-            </span>
-          </TableCell> */}
                   </TableRow>
                 ))}
               </TableBody>
@@ -182,6 +187,7 @@ export default function EmployeesContainer() {
       {state?.shouldShowInviteEmployeeDialog && (
         <InviteEmployeeDialog
           open={state?.shouldShowInviteEmployeeDialog}
+          user={user}
           onClose={handleCloseInviteEmployeeDialog}
           onSave={handleInviteEmployee}
         />
