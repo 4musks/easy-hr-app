@@ -1,69 +1,39 @@
-# Easy HR React Web Application
+# FA22: CMPE-272 Sec 48 - Enterprise SW Platforms
 
+University Name: **[San Jose State University](http://www.sjsu.edu)**
 
-## Available Scripts
+Course: [Enterprise SW Platforms](https://catalog.sjsu.edu/preview_course_nopop.php?catoid=12&coid=58384)
 
-In the project directory, you can run:
+Professor: Andrew Bond [SJSU](https://www.sjsu.edu/people/andrew.bond/)
 
-### `npm start`
+## 1. Students
 
-Runs the app in the development mode.
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Nihal Kaul [Linkedin](https://www.linkedin.com/in/nihalwashere)
 
-The page will reload when you make changes.
-You may also see any lint errors in the console.
+Utsav Rawat [Linkedin](https://www.linkedin.com/in/utsav-rawat-a519aa131)
 
-### `npm test`
+Jaya Krishna Thupili [Linkedin](https://www.linkedin.com/in/thupili)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 2. Project Introduction
+EasyHR is an application-based human resource management system. Every organization, whether government or private, uses an information system to store the data of their staff. EasyHR manages the administrative tasks of the human resource department, which involves the following.
+1.	Provides a portal for employees to access human resource related activities and information. 
+2.	Calculating their effective payable hours or days. 
+3.	Secure mechanism to access the platform (SSO). 
+4.	The system includes a user feedback section, for which employees can share their thoughts on areas of success or improvement needed in the workplace. This feedback helps employees to be heard and for management to take account of the necessary steps for prioritizing impactful agendas. 
+5.	It will let users sign in and input their timetable for each day of work, where managers can manage employee details, and employees can mark their attendance and fill in their daily task details. 
+6.	It will also calculate overtime and the total working hours of each employee. 
+7.	A single instance of the program will be able to serve multiple user groups under a multitenant architecture. These user groups are called tenants.
 
-### `npm run build`
+## 3. Architecture
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+![Architecture](resources/Easy-HR-Architecture_1.png)
+## 4. Local setup ad Configuration
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+$ cd easy-hr-app/
+$ npm install
+$ npm start
+```
+## 5. Sigin
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Open sigin page @             http://localhost:3000
