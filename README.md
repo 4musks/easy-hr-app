@@ -37,3 +37,7 @@ $ npm start
 ## 5. Sigin
 
 Open sigin page @             http://localhost:3000
+
+## 6. Demo
+
+![Demo](resources/EasyHR_Demo.mp4)
